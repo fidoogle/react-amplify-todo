@@ -4,19 +4,37 @@ import { API, graphqlOperation } from 'aws-amplify'
 import { createTodo } from './graphql/mutations'
 import { listTodos } from './graphql/queries'
 import { withAuthenticator, AmplifySignOut } from '@aws-amplify/ui-react';
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
 
 const initialState = { name: '', description: '', target_date: '', completion_date: '' }
 
 const App = () => {
   const [formState, setFormState] = useState(initialState)
   const [todos, setTodos] = useState([])
+  const [startDate, setStartDate] = useState(new Date());
+  const [endDate, setEndDate] = useState(new Date());
 
   useEffect(() => {
     fetchTodos()
   }, [])
 
+  function formatDate(value) {
+    let todate = value
+    try {
+      todate = new Date(value)
+      todate = todate.toLocaleDateString("en-US")
+    }
+    catch(e) {}
+    return todate
+  }
   function setInput(key, value) {
     setFormState({ ...formState, [key]: value })
+  }
+  function setDateValue(key, value) {
+    if (key==='target_date') setStartDate(value)
+    else setEndDate(value)
+    setInput(key, value)
   }
 
   async function fetchTodos() {
@@ -42,39 +60,40 @@ const App = () => {
   return (
     <div style={styles.container}>
     <AmplifySignOut />
-      <h2>Amplify Todos</h2>
+      <h2>My Todos</h2>
+
       <input
         onChange={event => setInput('name', event.target.value)}
         style={styles.input}
         value={formState.name} 
         placeholder="Name"
       />
+
       <input
         onChange={event => setInput('description', event.target.value)}
         style={styles.input}
         value={formState.description}
         placeholder="Description"
       />
-      <input
-        onChange={event => setInput('target_date', event.target.value)}
-        style={styles.input}
-        value={formState.target_date}
-        placeholder="Target Date"
-      />
-      <input
-        onChange={event => setInput('completion_date', event.target.value)}
-        style={styles.input}
-        value={formState.completion_date}
-        placeholder="Completion Date"
-      />
+
+      <div style={styles.fieldwithlabel}>
+        Target Date &nbsp;
+        <DatePicker selected={startDate} onChange={date => setDateValue('target_date', date)} placeholderText="Target Date"/>
+      </div>
+
+      <div style={styles.fieldwithlabel}>
+        Completion Date &nbsp;
+        <DatePicker selected={endDate} onChange={date => setDateValue('completion_date', date)} placeholderText="Completion Date"/>
+      </div>
+
       <button style={styles.button} onClick={addTodo}>Create Todo</button>
       {
         todos.map((todo, index) => (
           <div key={todo.id ? todo.id : index} style={styles.todo}>
             <p style={styles.todoName}>{todo.name}</p>
             <p style={styles.todoDescription}>{todo.description}</p>
-            <p style={styles.todoDescription}>{todo.target_date}</p>
-            <p style={styles.todoDescription}>{todo.completion_date}</p>
+            <p style={styles.todoDescription}>{formatDate(todo.target_date)}</p>
+            <p style={styles.todoDescription}>{formatDate(todo.completion_date)}</p>
           </div>
         ))
       }
@@ -86,6 +105,7 @@ const styles = {
   container: { width: 400, margin: '0 auto', display: 'flex', flex: 1, flexDirection: 'column', justifyContent: 'center', padding: 20 },
   todo: {  marginBottom: 15 },
   input: { border: 'none', backgroundColor: '#ddd', marginBottom: 10, padding: 8, fontSize: 18 },
+  fieldwithlabel: { border: 'none', backgroundColor: '#ddd', color: '#757575', marginBottom: 10, padding: 8, fontSize: 18 },
   todoName: { fontSize: '20px', fontWeight: 'bold' },
   todoDescription: { marginBottom: 0 },
   button: { backgroundColor: 'black', color: 'white', outline: 'none', fontSize: 18, padding: '12px 0px' }
