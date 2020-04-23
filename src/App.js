@@ -12,6 +12,7 @@ const initialState = { name: '', description: '', target_date: '', completion_da
 const App = () => {
   const [formState, setFormState] = useState(initialState)
   const [todos, setTodos] = useState([])
+  const [todosDone, setTodosDone] = useState([])
   const [startDate, setStartDate] = useState(new Date());
 
   useEffect(() => {
@@ -44,7 +45,8 @@ const App = () => {
     try {
       const todoData = await API.graphql(graphqlOperation(listTodos))
       const todos = todoData.data.listTodos.items
-      setTodos(todos)
+      setTodos(todos.filter(todo => !todo.completed))
+      setTodosDone(todos.filter(todo => todo.completed))
     } catch (err) { console.log('error fetching todos') }
   }
 
@@ -96,6 +98,8 @@ const App = () => {
       </div>
 
       <button style={styles.button} onClick={addTodo}>Create Todo</button>
+
+      <h2>Current Todos</h2>
       <table>
         <thead>
           <tr><th>Done</th>
@@ -107,6 +111,33 @@ const App = () => {
         <tbody>
         {
           todos.map((todo, index) => (
+            <tr key={todo.id ? todo.id : index} style={styles.todo}>
+              <td><input
+                type="checkbox"
+                checked={!!todo.completed}
+                onChange={event => handleCompleted(event, todo)} /></td>
+
+              <td>{todo.name}</td>
+              <td>{todo.description}</td>
+              <td>{formatDate(todo.target_date)}</td>
+            </tr>
+          ))
+        }
+        </tbody>
+      </table>
+
+      <h2>Completed Todos</h2>
+      <table>
+        <thead>
+          <tr><th>Done</th>
+          <th>Name</th>
+          <th>Description</th>
+          <th>Target</th>
+          </tr>
+        </thead>
+        <tbody>
+        {
+          todosDone.map((todo, index) => (
             <tr key={todo.id ? todo.id : index} style={styles.todo}>
               <td><input
                 type="checkbox"
