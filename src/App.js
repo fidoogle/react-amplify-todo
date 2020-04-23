@@ -13,7 +13,6 @@ const App = () => {
   const [formState, setFormState] = useState(initialState)
   const [todos, setTodos] = useState([])
   const [startDate, setStartDate] = useState(new Date());
-  const [endDate, setEndDate] = useState(new Date());
 
   useEffect(() => {
     fetchTodos()
@@ -29,16 +28,15 @@ const App = () => {
     return todate
   }
   function handleCompleted(event, todo) {
-    console.log(event.target.checked, {todo})
-    updateThisTodo({...todo, completed: event.target.checked})
+    const completion_date = (event.target.checked)? new Date() : ' '
+    updateThisTodo({...todo, completed: event.target.checked, completion_date})
   }
   function setInput(key, value) {
     setFormState({ ...formState, [key]: value })
   }
   function setDateValue(key, value) {
     if (!value) value = new Date()
-    if (key==='target_date') setStartDate(value)
-    else setEndDate(value)
+    setStartDate(value)
     setInput(key, value)
   }
 
@@ -67,6 +65,7 @@ const App = () => {
   async function updateThisTodo(todo) { 
     try {
       await API.graphql(graphqlOperation(updateTodo, {input: todo}))
+      fetchTodos() //TODO: refresh clientside to prevent a round-trip
     } catch (err) {
       console.log('error updating todo:', err)
     }
@@ -96,28 +95,31 @@ const App = () => {
         <DatePicker selected={startDate} onChange={date => setDateValue('target_date', date)} placeholderText="Target Date"/>
       </div>
 
-      <div style={styles.fieldwithlabel}>
-        Completion Date &nbsp;
-        <DatePicker selected={endDate} onChange={date => setDateValue('completion_date', date)} placeholderText="Completion Date"/>
-      </div>
-
       <button style={styles.button} onClick={addTodo}>Create Todo</button>
-      <table><tr><th>Done</th><th>Name</th><th>Description</th><th>Target</th><th>Completed</th></tr>
+      <table>
+        <thead>
+          <tr><th>Done</th>
+          <th>Name</th>
+          <th>Description</th>
+          <th>Target</th>
+          </tr>
+        </thead>
+        <tbody>
         {
           todos.map((todo, index) => (
             <tr key={todo.id ? todo.id : index} style={styles.todo}>
               <td><input
                 type="checkbox"
-                checked={todo.completed}
+                checked={!!todo.completed}
                 onChange={event => handleCompleted(event, todo)} /></td>
 
               <td>{todo.name}</td>
               <td>{todo.description}</td>
               <td>{formatDate(todo.target_date)}</td>
-              <td>{formatDate(todo.completion_date)}</td>
             </tr>
           ))
         }
+        </tbody>
       </table>
     </div>
   )
