@@ -17,6 +17,7 @@ const App = () => {
 
   useEffect(() => {
     fetchTodos()
+    //TODO: create an @aws_subscribe subscription and subscribe to it here for realtime updates
   }, [])
 
   function formatDate(value) {
