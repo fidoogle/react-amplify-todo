@@ -77,7 +77,7 @@ const App = () => {
   return (
     <div style={styles.container}>
     <AmplifySignOut />
-      <h2>My Todos</h2>
+      <h2>My Todos - Auto Deploy?</h2>
 
       <input
         onChange={event => setInput('name', event.target.value)}
