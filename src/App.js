@@ -1,7 +1,7 @@
 /* src/App.js */
 import React, { useEffect, useState } from 'react'
 import { API, graphqlOperation } from 'aws-amplify'
-import { createTodo } from './graphql/mutations'
+import { createTodo, updateTodo } from './graphql/mutations'
 import { listTodos } from './graphql/queries'
 import { withAuthenticator, AmplifySignOut } from '@aws-amplify/ui-react';
 import DatePicker from "react-datepicker";
@@ -28,10 +28,15 @@ const App = () => {
     catch(e) {}
     return todate
   }
+  function handleCompleted(event, todo) {
+    console.log(event.target.checked, {todo})
+    updateThisTodo({...todo, completed: event.target.checked})
+  }
   function setInput(key, value) {
     setFormState({ ...formState, [key]: value })
   }
   function setDateValue(key, value) {
+    if (!value) value = new Date()
     if (key==='target_date') setStartDate(value)
     else setEndDate(value)
     setInput(key, value)
@@ -45,7 +50,9 @@ const App = () => {
     } catch (err) { console.log('error fetching todos') }
   }
 
-  async function addTodo() {
+  //TODO: add @auth to model to save by owner. Info: https://aws-amplify.github.io/docs/cli-toolchain/graphql#auth
+  //TODO: fix saving unchanged default dates
+  async function addTodo() { 
     try {
       if (!formState.name || !formState.description) return
       const todo = { ...formState }
@@ -54,6 +61,14 @@ const App = () => {
       await API.graphql(graphqlOperation(createTodo, {input: todo}))
     } catch (err) {
       console.log('error creating todo:', err)
+    }
+  }
+
+  async function updateThisTodo(todo) { 
+    try {
+      await API.graphql(graphqlOperation(updateTodo, {input: todo}))
+    } catch (err) {
+      console.log('error updating todo:', err)
     }
   }
 
@@ -87,16 +102,23 @@ const App = () => {
       </div>
 
       <button style={styles.button} onClick={addTodo}>Create Todo</button>
-      {
-        todos.map((todo, index) => (
-          <div key={todo.id ? todo.id : index} style={styles.todo}>
-            <p style={styles.todoName}>{todo.name}</p>
-            <p style={styles.todoDescription}>{todo.description}</p>
-            <p style={styles.todoDescription}>{formatDate(todo.target_date)}</p>
-            <p style={styles.todoDescription}>{formatDate(todo.completion_date)}</p>
-          </div>
-        ))
-      }
+      <table><tr><th>Done</th><th>Name</th><th>Description</th><th>Target</th><th>Completed</th></tr>
+        {
+          todos.map((todo, index) => (
+            <tr key={todo.id ? todo.id : index} style={styles.todo}>
+              <td><input
+                type="checkbox"
+                checked={todo.completed}
+                onChange={event => handleCompleted(event, todo)} /></td>
+
+              <td>{todo.name}</td>
+              <td>{todo.description}</td>
+              <td>{formatDate(todo.target_date)}</td>
+              <td>{formatDate(todo.completion_date)}</td>
+            </tr>
+          ))
+        }
+      </table>
     </div>
   )
 }

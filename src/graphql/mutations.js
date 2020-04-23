@@ -8,6 +8,7 @@ export const createTodo = /* GraphQL */ `
   ) {
     createTodo(input: $input, condition: $condition) {
       id
+      completed
       name
       description
       target_date
@@ -22,6 +23,7 @@ export const updateTodo = /* GraphQL */ `
   ) {
     updateTodo(input: $input, condition: $condition) {
       id
+      completed
       name
       description
       target_date
@@ -36,6 +38,7 @@ export const deleteTodo = /* GraphQL */ `
   ) {
     deleteTodo(input: $input, condition: $condition) {
       id
+      completed
       name
       description
       target_date

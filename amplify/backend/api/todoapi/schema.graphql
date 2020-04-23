@@ -1,5 +1,6 @@
 type Todo @model {
   id: ID!
+  completed: Boolean
   name: String!
   description: String
   target_date: String

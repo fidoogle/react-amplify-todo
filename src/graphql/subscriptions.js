@@ -5,6 +5,7 @@ export const onCreateTodo = /* GraphQL */ `
   subscription OnCreateTodo {
     onCreateTodo {
       id
+      completed
       name
       description
       target_date
@@ -16,6 +17,7 @@ export const onUpdateTodo = /* GraphQL */ `
   subscription OnUpdateTodo {
     onUpdateTodo {
       id
+      completed
       name
       description
       target_date
@@ -27,6 +29,7 @@ export const onDeleteTodo = /* GraphQL */ `
   subscription OnDeleteTodo {
     onDeleteTodo {
       id
+      completed
       name
       description
       target_date
