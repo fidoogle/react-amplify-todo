@@ -77,7 +77,7 @@ const App = () => {
   return (
     <div style={styles.container}>
     <AmplifySignOut />
-      <h2>My Todos - Auto Deploy?</h2>
+      <h2>My Todos</h2>
 
       <input
         onChange={event => setInput('name', event.target.value)}
@@ -101,70 +101,80 @@ const App = () => {
       <button style={styles.button} onClick={addTodo}>Create Todo</button>
 
       <h2>Current Todos</h2>
-      <table>
-        <thead>
-          <tr><th>Done</th>
-          <th>Name</th>
-          <th>Description</th>
-          <th>Target</th>
-          </tr>
-        </thead>
-        <tbody>
-        {
-          todos.map((todo, index) => (
-            <tr key={todo.id ? todo.id : index} style={styles.todo}>
-              <td><input
-                type="checkbox"
-                checked={!!todo.completed}
-                onChange={event => handleCompleted(event, todo)} /></td>
-
-              <td>{todo.name}</td>
-              <td>{todo.description}</td>
-              <td>{formatDate(todo.target_date)}</td>
+      { todos.length===0 &&
+        <span>All done!</span>
+      }
+      { todos.length>0 && 
+        <table>
+          <thead>
+            <tr><th>Done</th>
+            <th>Name</th>
+            <th>Description</th>
+            <th>Target</th>
             </tr>
-          ))
-        }
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+          {
+            todos.map((todo, index) => (
+              <tr key={todo.id ? todo.id : index} style={styles.todo}>
+                <td><input
+                  type="checkbox"
+                  checked={!!todo.completed}
+                  onChange={event => handleCompleted(event, todo)} /></td>
+
+                <td>{todo.name}</td>
+                <td>{todo.description}</td>
+                <td>{formatDate(todo.target_date)}</td>
+              </tr>
+            ))
+          }
+          </tbody>
+        </table>
+      }
 
       <h2>Completed Todos</h2>
-      <table>
-        <thead>
-          <tr><th>Done</th>
-          <th>Name</th>
-          <th>Description</th>
-          <th>Target</th>
-          </tr>
-        </thead>
-        <tbody>
-        {
-          todosDone.map((todo, index) => (
-            <tr key={todo.id ? todo.id : index} style={styles.todo}>
-              <td><input
-                type="checkbox"
-                checked={!!todo.completed}
-                onChange={event => handleCompleted(event, todo)} /></td>
-
-              <td>{todo.name}</td>
-              <td>{todo.description}</td>
-              <td>{formatDate(todo.target_date)}</td>
+      { todosDone.length===0 &&
+        <span>Need to get busy!</span>
+      }
+      { todosDone.length>0 && 
+        <table>
+          <thead>
+            <tr><th>Done</th>
+            <th>Name</th>
+            <th>Description</th>
+            <th>Completed</th>
             </tr>
-          ))
-        }
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+          {
+            todosDone.map((todo, index) => (
+              <tr key={todo.id ? todo.id : index} style={styles.todo}>
+                <td><input
+                  type="checkbox"
+                  checked={!!todo.completed}
+                  onChange={event => handleCompleted(event, todo)} /></td>
+
+                <td>{todo.name}</td>
+                <td>{todo.description}</td>
+                <td>{formatDate(todo.target_date)}</td>
+              </tr>
+            ))
+          }
+          </tbody>
+        </table>
+      }
     </div>
   )
 }
 
 const styles = {
-  container: { width: 400, margin: '0 auto', display: 'flex', flex: 1, flexDirection: 'column', justifyContent: 'center', padding: 20 },
+  container: { width: '450px', margin: '0 auto', display: 'flex', flex: 1, flexDirection: 'column', justifyContent: 'center', padding: 20 },
   todo: {  marginBottom: 15 },
   input: { border: 'none', backgroundColor: '#ddd', marginBottom: 10, padding: 8, fontSize: 18 },
   fieldwithlabel: { border: 'none', backgroundColor: '#ddd', color: '#757575', marginBottom: 10, padding: 8, fontSize: 18 },
   todoName: { fontSize: '20px', fontWeight: 'bold' },
   todoDescription: { marginBottom: 0 },
-  button: { backgroundColor: 'black', color: 'white', outline: 'none', fontSize: 18, padding: '12px 0px' }
+  button: { backgroundColor: 'black', color: 'white', outline: 'none', fontSize: 18, padding: '12px 0px', cursor: 'pointer' }
 }
 
 export default withAuthenticator(App)
