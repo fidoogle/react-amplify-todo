@@ -61,12 +61,12 @@ export default function CheckboxList({todos, handleCompleted}) {
                 <React.Fragment>
                   {todo.description}
                   <Typography
-                    component="div"
+                    component="b"
                     variant="body2"
                     className={classes.inline}
-                    color="textPrimary"
+                    color="textSecondary"
                   >
-                    Completed: {formatDate(todo.completion_date)}
+                    <br/>Completed: {formatDate(todo.completion_date)}
                   </Typography>
                 </React.Fragment>
               }

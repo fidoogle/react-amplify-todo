@@ -21,16 +21,6 @@ const App = () => {
     //TODO: create an @aws_subscribe subscription and subscribe to it here for realtime updates
   }, [])
 
-  function formatDate(value) {
-    //let todate = value
-    try {
-      const todate = new Date(value)
-      //todate = todate.toLocaleDateString("en-US")
-      return todate.toLocaleDateString("en-US")
-    }
-    catch(e) { return '???'}
-    //return todate
-  }
   function handleCompleted(event, todo) {
     const completion_date = (event.target.checked)? new Date() : '???'
     updateThisTodo({...todo, completed: event.target.checked, completion_date})
@@ -105,7 +95,7 @@ const App = () => {
       <h2>Current Todos</h2>
       
       <CheckboxList todos={todos} handleCompleted={handleCompleted}></CheckboxList>
-      
+
     </div>
   )
 }
@@ -115,8 +105,6 @@ const styles = {
   todo: {  marginBottom: 15 },
   input: { border: 'none', backgroundColor: '#ddd', marginBottom: 10, padding: 8, fontSize: 18 },
   fieldwithlabel: { border: 'none', backgroundColor: '#ddd', color: '#757575', marginBottom: 10, padding: 8, fontSize: 18 },
-  todoName: { fontSize: '20px', fontWeight: 'bold' },
-  todoDescription: { marginBottom: 0 },
   button: { backgroundColor: 'black', color: 'white', outline: 'none', fontSize: 18, padding: '12px 0px', cursor: 'pointer' }
 }
 
