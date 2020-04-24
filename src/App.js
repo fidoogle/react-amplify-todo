@@ -6,6 +6,7 @@ import { listTodos } from './graphql/queries'
 import { withAuthenticator, AmplifySignOut } from '@aws-amplify/ui-react';
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
+import  CheckboxList from './components/CheckboxList';
 
 const initialState = { name: '', description: '', target_date: '', completion_date: '' }
 
@@ -21,16 +22,17 @@ const App = () => {
   }, [])
 
   function formatDate(value) {
-    let todate = value
+    //let todate = value
     try {
-      todate = new Date(value)
-      todate = todate.toLocaleDateString("en-US")
+      const todate = new Date(value)
+      //todate = todate.toLocaleDateString("en-US")
+      return todate.toLocaleDateString("en-US")
     }
-    catch(e) {}
-    return todate
+    catch(e) { return '???'}
+    //return todate
   }
   function handleCompleted(event, todo) {
-    const completion_date = (event.target.checked)? new Date() : ' '
+    const completion_date = (event.target.checked)? new Date() : '???'
     updateThisTodo({...todo, completed: event.target.checked, completion_date})
   }
   function setInput(key, value) {
@@ -46,7 +48,7 @@ const App = () => {
     try {
       const todoData = await API.graphql(graphqlOperation(listTodos))
       const todos = todoData.data.listTodos.items
-      setTodos(todos.filter(todo => !todo.completed))
+      setTodos(todos)
       setTodosDone(todos.filter(todo => todo.completed))
     } catch (err) { console.log('error fetching todos') }
   }
@@ -101,68 +103,9 @@ const App = () => {
       <button style={styles.button} onClick={addTodo}>Create Todo</button>
 
       <h2>Current Todos</h2>
-      { todos.length===0 &&
-        <span>All done!</span>
-      }
-      { todos.length>0 && 
-        <table>
-          <thead>
-            <tr><th>Done</th>
-            <th>Name</th>
-            <th>Description</th>
-            <th>Target</th>
-            </tr>
-          </thead>
-          <tbody>
-          {
-            todos.map((todo, index) => (
-              <tr key={todo.id ? todo.id : index} style={styles.todo}>
-                <td><input
-                  type="checkbox"
-                  checked={!!todo.completed}
-                  onChange={event => handleCompleted(event, todo)} /></td>
-
-                <td>{todo.name}</td>
-                <td>{todo.description}</td>
-                <td>{formatDate(todo.target_date)}</td>
-              </tr>
-            ))
-          }
-          </tbody>
-        </table>
-      }
-
-      <h2>Completed Todos</h2>
-      { todosDone.length===0 &&
-        <span>Need to get busy!</span>
-      }
-      { todosDone.length>0 && 
-        <table>
-          <thead>
-            <tr><th>Done</th>
-            <th>Name</th>
-            <th>Description</th>
-            <th>Completed</th>
-            </tr>
-          </thead>
-          <tbody>
-          {
-            todosDone.map((todo, index) => (
-              <tr key={todo.id ? todo.id : index} style={styles.todo}>
-                <td><input
-                  type="checkbox"
-                  checked={!!todo.completed}
-                  onChange={event => handleCompleted(event, todo)} /></td>
-
-                <td>{todo.name}</td>
-                <td>{todo.description}</td>
-                <td>{formatDate(todo.target_date)}</td>
-              </tr>
-            ))
-          }
-          </tbody>
-        </table>
-      }
+      
+      <CheckboxList todos={todos} handleCompleted={handleCompleted}></CheckboxList>
+      
     </div>
   )
 }
