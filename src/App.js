@@ -6,6 +6,7 @@ import { listTodos } from './graphql/queries'
 import { withAuthenticator, AmplifySignOut } from '@aws-amplify/ui-react';
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
+import  CheckboxList from './components/CheckboxList';
 
 const initialState = { name: '', description: '', target_date: '', completion_date: '' }
 
@@ -20,17 +21,8 @@ const App = () => {
     //TODO: create an @aws_subscribe subscription and subscribe to it here for realtime updates
   }, [])
 
-  function formatDate(value) {
-    let todate = value
-    try {
-      todate = new Date(value)
-      todate = todate.toLocaleDateString("en-US")
-    }
-    catch(e) {}
-    return todate
-  }
   function handleCompleted(event, todo) {
-    const completion_date = (event.target.checked)? new Date() : ' '
+    const completion_date = (event.target.checked)? new Date() : '???'
     updateThisTodo({...todo, completed: event.target.checked, completion_date})
   }
   function setInput(key, value) {
@@ -46,7 +38,7 @@ const App = () => {
     try {
       const todoData = await API.graphql(graphqlOperation(listTodos))
       const todos = todoData.data.listTodos.items
-      setTodos(todos.filter(todo => !todo.completed))
+      setTodos(todos)
       setTodosDone(todos.filter(todo => todo.completed))
     } catch (err) { console.log('error fetching todos') }
   }
@@ -77,7 +69,7 @@ const App = () => {
   return (
     <div style={styles.container}>
     <AmplifySignOut />
-      <h2>My Todos - Auto Deploy?</h2>
+      <h2>My Todos</h2>
 
       <input
         onChange={event => setInput('name', event.target.value)}
@@ -101,70 +93,19 @@ const App = () => {
       <button style={styles.button} onClick={addTodo}>Create Todo</button>
 
       <h2>Current Todos</h2>
-      <table>
-        <thead>
-          <tr><th>Done</th>
-          <th>Name</th>
-          <th>Description</th>
-          <th>Target</th>
-          </tr>
-        </thead>
-        <tbody>
-        {
-          todos.map((todo, index) => (
-            <tr key={todo.id ? todo.id : index} style={styles.todo}>
-              <td><input
-                type="checkbox"
-                checked={!!todo.completed}
-                onChange={event => handleCompleted(event, todo)} /></td>
+      
+      <CheckboxList todos={todos} handleCompleted={handleCompleted}></CheckboxList>
 
-              <td>{todo.name}</td>
-              <td>{todo.description}</td>
-              <td>{formatDate(todo.target_date)}</td>
-            </tr>
-          ))
-        }
-        </tbody>
-      </table>
-
-      <h2>Completed Todos</h2>
-      <table>
-        <thead>
-          <tr><th>Done</th>
-          <th>Name</th>
-          <th>Description</th>
-          <th>Target</th>
-          </tr>
-        </thead>
-        <tbody>
-        {
-          todosDone.map((todo, index) => (
-            <tr key={todo.id ? todo.id : index} style={styles.todo}>
-              <td><input
-                type="checkbox"
-                checked={!!todo.completed}
-                onChange={event => handleCompleted(event, todo)} /></td>
-
-              <td>{todo.name}</td>
-              <td>{todo.description}</td>
-              <td>{formatDate(todo.target_date)}</td>
-            </tr>
-          ))
-        }
-        </tbody>
-      </table>
     </div>
   )
 }
 
 const styles = {
-  container: { width: 400, margin: '0 auto', display: 'flex', flex: 1, flexDirection: 'column', justifyContent: 'center', padding: 20 },
+  container: { width: '450px', margin: '0 auto', display: 'flex', flex: 1, flexDirection: 'column', justifyContent: 'center', padding: 20 },
   todo: {  marginBottom: 15 },
   input: { border: 'none', backgroundColor: '#ddd', marginBottom: 10, padding: 8, fontSize: 18 },
   fieldwithlabel: { border: 'none', backgroundColor: '#ddd', color: '#757575', marginBottom: 10, padding: 8, fontSize: 18 },
-  todoName: { fontSize: '20px', fontWeight: 'bold' },
-  todoDescription: { marginBottom: 0 },
-  button: { backgroundColor: 'black', color: 'white', outline: 'none', fontSize: 18, padding: '12px 0px' }
+  button: { backgroundColor: 'black', color: 'white', outline: 'none', fontSize: 18, padding: '12px 0px', cursor: 'pointer' }
 }
 
 export default withAuthenticator(App)
